@@ -4,6 +4,7 @@
   "cpu": "256",   
   "memory": "512", 
   "executionRoleArn": "arn:aws:iam::534224643194:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::534224643194:role/api-monedas-task-role",
   "containerDefinitions": [
     {
       "name": "api-monedas-container", 
