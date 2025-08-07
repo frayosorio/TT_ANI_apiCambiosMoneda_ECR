@@ -1,0 +1,33 @@
+{
+  "family": "api-monedas-task-definition-tt",
+  "networkMode": "awsvpc",
+  "cpu": "256",   
+  "memory": "512", 
+  "executionRoleArn": "arn:aws:iam::534224643194:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "api-monedas-container", 
+      "image": "534224643194.dkr.ecr.us-east-2.amazonaws.com/api-monedas-tt:latest", 
+      "portMappings": [
+        {
+          "containerPort": 8080, 
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/api-monedas-tt", 
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "requiresCompatibilities": ["FARGATE"],
+  "runtimePlatform": {
+      "operatingSystemFamily": "LINUX"
+  }
+}

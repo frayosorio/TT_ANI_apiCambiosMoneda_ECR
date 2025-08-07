@@ -13,64 +13,70 @@ import monedas.api.infraestructura.repositorios.*;
 @Service
 public class MonedaServicio implements IMonedaServicio {
 
-private IMonedaRepositorio repositorio;
-private ICambioMonedaRepositorio repositorioCambio;
+    private IMonedaRepositorio repositorio;
+    private ICambioMonedaRepositorio repositorioCambio;
 
-public MonedaServicio(IMonedaRepositorio repositorio,
-                        ICambioMonedaRepositorio repositorioCambio){
-    this.repositorio=repositorio;
-    this.repositorioCambio=repositorioCambio;
-}
+    public MonedaServicio(IMonedaRepositorio repositorio,
+            ICambioMonedaRepositorio repositorioCambio) {
+        this.repositorio = repositorio;
+        this.repositorioCambio = repositorioCambio;
+    }
 
     @Override
-    public List<Moneda> listar(){
+    public List<Moneda> listar() {
         return repositorio.findAll();
-     }
+    }
 
     @Override
-    public Moneda obtener(Long id){
+    public Moneda obtener(Long id) {
         var moneda = repositorio.findById(id);
-        return moneda.isEmpty()? null : moneda.get();
-     }
+        return moneda.isEmpty() ? null : moneda.get();
+    }
 
     @Override
-    public List<Moneda> buscar(String nombre){ 
+    public List<Moneda> buscar(String nombre) {
         return repositorio.buscar(nombre);
     }
 
     @Override
-    public Moneda buscarPorPais(String nombre){ 
+    public Moneda buscarPorPais(String nombre) {
         return repositorio.buscarPorPais(nombre);
     }
 
     @Override
-    public Moneda agregar(Moneda moneda){ 
+    public Moneda agregar(Moneda moneda) {
         moneda.setId(0);
-        return repositorio.save(moneda);
+        var monedaNueva = repositorio.save(moneda);
+        AWSServicio.publicarMetrica("MonedasAgregadas", 1);
+        return monedaNueva;
     }
 
     @Override
-    public Moneda modificar(Moneda moneda){ 
+    public Moneda modificar(Moneda moneda) {
         Optional<Moneda> monedaEncontrado = repositorio.findById(moneda.getId());
         if (!monedaEncontrado.isEmpty()) {
-            return repositorio.save(moneda);
+            var monedaActualizada = repositorio.save(moneda);
+            AWSServicio.publicarMetrica("MonedasModificadas", 1);
+            return monedaActualizada;
         } else {
+
             return null;
         }
     }
 
     @Override
-    public boolean eliminar(Long id){ 
+    public boolean eliminar(Long id) {
         try {
             repositorio.deleteById(id);
+            AWSServicio.publicarMetrica("MonedasEliminadas", 1);
             return true;
         } catch (Exception ex) {
             return false;
         }
     }
-	
+
     @Override
-	public List<CambioMoneda> listarPorPeriodo(long idMoneda, Date fecha1, Date fecha2){ 
+    public List<CambioMoneda> listarPorPeriodo(long idMoneda, Date fecha1, Date fecha2) {
         return repositorioCambio.listarPorPeriodo(idMoneda, fecha1, fecha2);
     }
 
